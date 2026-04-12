@@ -1,0 +1,36 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+conda-meta/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Output files
+output/
+results/
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+
+# Optional: ignore dataset if too large
+data_road/
+data/
