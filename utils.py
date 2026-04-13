@@ -99,4 +99,7 @@ def draw_lane_lines(image):
 
     combo_image = cv2.addWeighted(image_rgb, 0.8, line_image, 1.0, 0)
 
-    return image_rgb, line_image, combo_image
+    left_detected = left_line is not None
+    right_detected = right_line is not None
+
+    return image_rgb, line_image, combo_image, left_detected, right_detected

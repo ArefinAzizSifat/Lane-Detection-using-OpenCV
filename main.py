@@ -2,6 +2,7 @@ import os
 import cv2
 import glob
 import argparse
+import csv
 import matplotlib.pyplot as plt
 
 from utils import draw_lane_lines, process_image_steps
@@ -39,11 +40,13 @@ image_input = args.image
 output_path = args.output
 limit = args.limit
 
+
 if os.path.isdir(image_input):
     image_paths = sorted(glob.glob(os.path.join(image_input, "*.png")))[:limit]
 else:
     image_paths = [image_input]
 
+summary_rows = []
 for image_path in image_paths:
     image = cv2.imread(image_path)
 
@@ -51,7 +54,8 @@ for image_path in image_paths:
         print(f"Error: could not read image {image_path}")
         continue
 
-    original, lines_only, result = draw_lane_lines(image)
+    original, lines_only, result, left_detected, right_detected = draw_lane_lines(
+        image)
     gray, blur, edges, roi_edges = process_image_steps(image)
 
     if os.path.isdir(image_input):
@@ -82,6 +86,12 @@ for image_path in image_paths:
     cv2.imwrite(os.path.join(
         save_dir, f"{base_name}_roi_edges.png"), roi_edges)
 
+    summary_rows.append({
+        "image_name": os.path.basename(image_path),
+        "left_line_detected": left_detected,
+        "right_line_detected": right_detected
+    })
+
     if show_results:
         plt.figure(figsize=(18, 5))
 
@@ -101,3 +111,17 @@ for image_path in image_paths:
         plt.axis("off")
 
         plt.show()
+
+    summary_path = "output/processing_summary.csv"
+    os.makedirs("output", exist_ok=True)
+
+    with open(summary_path, "w", newline="") as csvfile:
+        writer = csv.DictWriter(
+            csvfile,
+            fieldnames=["image_name", "left_line_detected",
+                        "right_line_detected"]
+        )
+        writer.writeheader()
+        writer.writerows(summary_rows)
+
+    print(f"Saved summary to: {summary_path}")
