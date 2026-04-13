@@ -1,4 +1,5 @@
 import cv2
+import matplotlib.pyplot as plt
 
 image_path = "data_road/training/image_2/um_000000.png"
 
@@ -7,9 +8,33 @@ image = cv2.imread(image_path)
 if image is None:
     print("Error: image not found. Check the path.")
 else:
-    print("Image loaded successfully.")
-    print("Image shape:", image.shape)
+    print("Color image loaded successfully.")
+    print("Color image shape:", image.shape)
 
-    cv2.imshow("KITTI Image", image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    print("Grayscale image shape:", gray.shape)
+
+    blur = cv2.GaussianBlur(gray, (5, 5), 0)
+    print("Blurred image shape:", blur.shape)
+
+    # OpenCV loads color as BGR, matplotlib expects RGB
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    plt.figure(figsize=(15, 5))
+
+    plt.subplot(1, 3, 1)
+    plt.imshow(image_rgb)
+    plt.title("Original Image")
+    plt.axis("off")
+
+    plt.subplot(1, 3, 2)
+    plt.imshow(gray, cmap="gray")
+    plt.title("Grayscale Image")
+    plt.axis("off")
+
+    plt.subplot(1, 3, 3)
+    plt.imshow(blur, cmap="gray")
+    plt.title("Blurred Image")
+    plt.axis("off")
+
+    plt.show()
