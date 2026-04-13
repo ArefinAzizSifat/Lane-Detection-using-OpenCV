@@ -86,31 +86,56 @@ for image_path in image_paths:
     cv2.imwrite(os.path.join(
         save_dir, f"{base_name}_roi_edges.png"), roi_edges)
 
-    summary_rows.append({
-        "image_name": os.path.basename(image_path),
-        "left_line_detected": left_detected,
-        "right_line_detected": right_detected
-    })
+    fig, axes = plt.subplots(1, 4, figsize=(20, 5))
 
-    if show_results:
-        plt.figure(figsize=(18, 5))
+    axes[0].imshow(original)
+    axes[0].set_title("Original")
+    axes[0].axis("off")
 
-        plt.subplot(1, 3, 1)
-        plt.imshow(original)
-        plt.title("Original Image")
-        plt.axis("off")
+    axes[1].imshow(edges, cmap="gray")
+    axes[1].set_title("Canny Edges")
+    axes[1].axis("off")
 
-        plt.subplot(1, 3, 2)
-        plt.imshow(lines_only)
-        plt.title("Detected Lane Lines Only")
-        plt.axis("off")
+    axes[2].imshow(roi_edges, cmap="gray")
+    axes[2].set_title("ROI Edges")
+    axes[2].axis("off")
 
-        plt.subplot(1, 3, 3)
-        plt.imshow(result)
-        plt.title("Overlay Result")
-        plt.axis("off")
+    axes[3].imshow(result)
+    axes[3].set_title("Overlay Result")
+    axes[3].axis("off")
 
-        plt.show()
+comparison_path = os.path.join(save_dir, f"{base_name}_comparison.png")
+plt.tight_layout()
+plt.savefig(comparison_path, bbox_inches="tight")
+plt.close(fig)
+
+print(f"Saved comparison figure to: {comparison_path}")
+
+summary_rows.append({
+    "image_name": os.path.basename(image_path),
+    "left_line_detected": left_detected,
+    "right_line_detected": right_detected
+})
+
+if show_results:
+    plt.figure(figsize=(18, 5))
+
+    plt.subplot(1, 3, 1)
+    plt.imshow(original)
+    plt.title("Original Image")
+    plt.axis("off")
+
+    plt.subplot(1, 3, 2)
+    plt.imshow(lines_only)
+    plt.title("Detected Lane Lines Only")
+    plt.axis("off")
+
+    plt.subplot(1, 3, 3)
+    plt.imshow(result)
+    plt.title("Overlay Result")
+    plt.axis("off")
+
+    plt.show()
 
     summary_path = "output/processing_summary.csv"
     os.makedirs("output", exist_ok=True)
