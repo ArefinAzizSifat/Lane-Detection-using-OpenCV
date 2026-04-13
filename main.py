@@ -17,24 +17,32 @@ else:
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
     print("Blurred image shape:", blur.shape)
 
+    edges = cv2.Canny(blur, 50, 150)
+    print("Edges image shape:", edges.shape)
+
     # OpenCV loads color as BGR, matplotlib expects RGB
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    plt.figure(figsize=(15, 5))
+    plt.figure(figsize=(18, 5))
 
-    plt.subplot(1, 3, 1)
+    plt.subplot(1, 4, 1)
     plt.imshow(image_rgb)
     plt.title("Original Image")
     plt.axis("off")
 
-    plt.subplot(1, 3, 2)
+    plt.subplot(1, 4, 2)
     plt.imshow(gray, cmap="gray")
     plt.title("Grayscale Image")
     plt.axis("off")
 
-    plt.subplot(1, 3, 3)
+    plt.subplot(1, 4, 3)
     plt.imshow(blur, cmap="gray")
     plt.title("Blurred Image")
+    plt.axis("off")
+
+    plt.subplot(1, 4, 4)
+    plt.imshow(edges, cmap="gray")
+    plt.title("Canny Edges")
     plt.axis("off")
 
     plt.show()
