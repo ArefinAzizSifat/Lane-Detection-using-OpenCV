@@ -6,6 +6,22 @@ image_path = "data_road/training/image_2/um_000000.png"
 
 image = cv2.imread(image_path)
 
+
+def make_line_points(y1, y2, line_params):
+    if line_params is None:
+        return None
+
+    slope, intercept = line_params
+
+    if slope == 0:
+        return None
+
+    x1 = int((y1 - intercept) / slope)
+    x2 = int((y2 - intercept) / slope)
+
+    return (x1, int(y1), x2, int(y2))
+
+
 if image is None:
     print("Error: image not found. Check the path.")
 else:
@@ -91,21 +107,55 @@ if lines is not None:
 else:
     print("No lines detected.")
 
+left_fits = []
+right_fits = []
+
+if lines is not None:
+    for line in lines:
+        x1, y1, x2, y2 = line[0]
+
+        if x1 == x2:
+            continue
+
+        slope = (y2 - y1) / (x2 - x1)
+
+        if abs(slope) > 0.5:
+            intercept = y1 - slope * x1
+
+            if slope < 0:
+                left_fits.append((slope, intercept))
+            else:
+                right_fits.append((slope, intercept))
+
+left_avg = np.mean(left_fits, axis=0) if left_fits else None
+right_avg = np.mean(right_fits, axis=0) if right_fits else None
+
+y1 = height
+y2 = int(height * 0.6)
+
+left_line = make_line_points(y1, y2, left_avg)
+right_line = make_line_points(y1, y2, right_avg)
+
+final_image = image_rgb.copy()
+
+if left_line is not None:
+    x1, y1, x2, y2 = left_line
+    cv2.line(final_image, (x1, y1), (x2, y2), (255, 0, 0), 5)
+
+if right_line is not None:
+    x1, y1, x2, y2 = right_line
+    cv2.line(final_image, (x1, y1), (x2, y2), (255, 0, 0), 5)
+
 plt.figure(figsize=(18, 5))
 
-plt.subplot(1, 3, 1)
+plt.subplot(1, 2, 1)
 plt.imshow(image_rgb)
 plt.title("Original Image")
 plt.axis("off")
 
-plt.subplot(1, 3, 2)
-plt.imshow(left_image)
-plt.title("Left-Side Lines")
-plt.axis("off")
-
-plt.subplot(1, 3, 3)
-plt.imshow(right_image)
-plt.title("Right-Side Lines")
+plt.subplot(1, 2, 2)
+plt.imshow(final_image)
+plt.title("Averaged Left and Right Lines")
 plt.axis("off")
 
 plt.show()
