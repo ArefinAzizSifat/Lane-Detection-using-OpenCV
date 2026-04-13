@@ -38,24 +38,23 @@ roi_edges = cv2.bitwise_and(edges, mask)
 # OpenCV loads color as BGR, matplotlib expects RGB
 image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
+image_with_roi = image_rgb.copy()
+cv2.polylines(image_with_roi, polygon, isClosed=True,
+              color=(255, 0, 0), thickness=3)
+
 plt.figure(figsize=(18, 5))
 
-plt.subplot(1, 4, 1)
+plt.subplot(1, 3, 1)
 plt.imshow(image_rgb)
 plt.title("Original Image")
 plt.axis("off")
 
-plt.subplot(1, 4, 2)
-plt.imshow(gray, cmap="gray")
-plt.title("Grayscale Image")
+plt.subplot(1, 3, 2)
+plt.imshow(image_with_roi)
+plt.title("Original Image with ROI Polygon")
 plt.axis("off")
 
-plt.subplot(1, 4, 3)
-plt.imshow(mask, cmap="gray")
-plt.title("ROI Mask")
-plt.axis("off")
-
-plt.subplot(1, 4, 4)
+plt.subplot(1, 3, 3)
 plt.imshow(roi_edges, cmap="gray")
 plt.title("Edges After ROI")
 plt.axis("off")
