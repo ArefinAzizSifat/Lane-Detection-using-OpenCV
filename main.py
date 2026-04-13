@@ -1,5 +1,6 @@
 import cv2
 import matplotlib.pyplot as plt
+import numpy as np
 
 image_path = "data_road/training/image_2/um_000000.png"
 
@@ -20,29 +21,43 @@ else:
     edges = cv2.Canny(blur, 50, 150)
     print("Edges image shape:", edges.shape)
 
-    # OpenCV loads color as BGR, matplotlib expects RGB
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    height, width = edges.shape
 
-    plt.figure(figsize=(18, 5))
+    polygon = np.array([[
+        (100, height),
+        (width - 100, height),
+        (width // 2 + 80, height // 2 + 40),
+        (width // 2 - 80, height // 2 + 40)
+    ]], dtype=np.int32)
 
-    plt.subplot(1, 4, 1)
-    plt.imshow(image_rgb)
-    plt.title("Original Image")
-    plt.axis("off")
+mask = np.zeros_like(edges)
+cv2.fillPoly(mask, polygon, 255)
 
-    plt.subplot(1, 4, 2)
-    plt.imshow(gray, cmap="gray")
-    plt.title("Grayscale Image")
-    plt.axis("off")
+roi_edges = cv2.bitwise_and(edges, mask)
 
-    plt.subplot(1, 4, 3)
-    plt.imshow(blur, cmap="gray")
-    plt.title("Blurred Image")
-    plt.axis("off")
+# OpenCV loads color as BGR, matplotlib expects RGB
+image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    plt.subplot(1, 4, 4)
-    plt.imshow(edges, cmap="gray")
-    plt.title("Canny Edges")
-    plt.axis("off")
+plt.figure(figsize=(18, 5))
 
-    plt.show()
+plt.subplot(1, 4, 1)
+plt.imshow(image_rgb)
+plt.title("Original Image")
+plt.axis("off")
+
+plt.subplot(1, 4, 2)
+plt.imshow(gray, cmap="gray")
+plt.title("Grayscale Image")
+plt.axis("off")
+
+plt.subplot(1, 4, 3)
+plt.imshow(mask, cmap="gray")
+plt.title("ROI Mask")
+plt.axis("off")
+
+plt.subplot(1, 4, 4)
+plt.imshow(roi_edges, cmap="gray")
+plt.title("Edges After ROI")
+plt.axis("off")
+
+plt.show()
