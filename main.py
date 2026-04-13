@@ -60,6 +60,37 @@ if lines is not None:
 else:
     print("No lines detected.")
 
+if lines is not None:
+    left_lines = []
+    right_lines = []
+
+left_image = image_rgb.copy()
+right_image = image_rgb.copy()
+
+if lines is not None:
+    print("Total detected lines:", len(lines))
+
+    for line in lines:
+        x1, y1, x2, y2 = line[0]
+
+        if x2 == x1:
+            continue
+
+        slope = (y2 - y1) / (x2 - x1)
+
+        if abs(slope) > 0.5:
+            if slope < 0:
+                left_lines.append((x1, y1, x2, y2))
+                cv2.line(left_image, (x1, y1), (x2, y2), (255, 0, 0), 3)
+            else:
+                right_lines.append((x1, y1, x2, y2))
+                cv2.line(right_image, (x1, y1), (x2, y2), (255, 0, 0), 3)
+
+    print("Left lines:", len(left_lines))
+    print("Right lines:", len(right_lines))
+else:
+    print("No lines detected.")
+
 plt.figure(figsize=(18, 5))
 
 plt.subplot(1, 3, 1)
@@ -68,13 +99,13 @@ plt.title("Original Image")
 plt.axis("off")
 
 plt.subplot(1, 3, 2)
-plt.imshow(image_with_roi)
-plt.title("Original Image with ROI Polygon")
+plt.imshow(left_image)
+plt.title("Left-Side Lines")
 plt.axis("off")
 
 plt.subplot(1, 3, 3)
-plt.imshow(line_image)
-plt.title("Detected Line Segments")
+plt.imshow(right_image)
+plt.title("Right-Side Lines")
 plt.axis("off")
 
 plt.show()
