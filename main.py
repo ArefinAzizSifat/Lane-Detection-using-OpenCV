@@ -1,9 +1,14 @@
 import os
 import cv2
 import matplotlib.pyplot as plt
+import argparse
 from utils import draw_lane_lines
 
-image_path = "data_road/training/image_2/um_000000.png"
+parser = argparse.ArgumentParser(description="Lane Detection")
+parser.add_argument("--image", help="Path to the input image")
+args = parser.parse_args()
+
+image_path = args.image if args.image else "data_road/training/image_2/um_000000.png"
 image = cv2.imread(image_path)
 
 if image is None:
