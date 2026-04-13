@@ -125,3 +125,16 @@ for image_path in image_paths:
         writer.writerows(summary_rows)
 
     print(f"Saved summary to: {summary_path}")
+total_images = len(summary_rows)
+left_count = sum(row["left_line_detected"] for row in summary_rows)
+right_count = sum(row["right_line_detected"] for row in summary_rows)
+both_count = sum(
+    row["left_line_detected"] and row["right_line_detected"]
+    for row in summary_rows
+)
+
+print("\nBatch Processing Summary")
+print(f"Total images processed: {total_images}")
+print(f"Left line detected: {left_count}")
+print(f"Right line detected: {right_count}")
+print(f"Both lines detected: {both_count}")
