@@ -19,6 +19,15 @@ def region_of_interest(edges):
     return roi_edges
 
 
+def process_image_steps(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    blur = cv2.GaussianBlur(gray, (5, 5), 0)
+    edges = cv2.Canny(blur, 50, 150)
+    roi_edges = region_of_interest(edges)
+
+    return gray, blur, edges, roi_edges
+
+
 def make_line_points(y1, y2, line_params):
     if line_params is None:
         return None
@@ -35,11 +44,7 @@ def make_line_points(y1, y2, line_params):
 
 
 def draw_lane_lines(image):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    blur = cv2.GaussianBlur(gray, (5, 5), 0)
-    edges = cv2.Canny(blur, 50, 150)
-
-    roi_edges = region_of_interest(edges)
+    gray, blur, edges, roi_edges = process_image_steps(image)
 
     lines = cv2.HoughLinesP(
         roi_edges,

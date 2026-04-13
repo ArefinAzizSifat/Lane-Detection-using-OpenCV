@@ -1,22 +1,24 @@
 import os
 import cv2
-import matplotlib.pyplot as plt
-import argparse
 import glob
-from utils import draw_lane_lines
+import argparse
+import matplotlib.pyplot as plt
+
+from utils import draw_lane_lines, process_image_steps
+
 
 parser = argparse.ArgumentParser(description="Lane Detection")
 parser.add_argument(
     "--image",
     type=str,
     default="data_road/training/image_2/um_000000.png",
-    help="Path to the input image"
+    help="Path to the input image or folder"
 )
 parser.add_argument(
     "--output",
     type=str,
     default="output/kitti_result.png",
-    help="Path to save the output image"
+    help="Path to save the output image or folder"
 )
 parser.add_argument(
     "--limit",
@@ -24,7 +26,6 @@ parser.add_argument(
     default=5,
     help="Number of images to process from the folder"
 )
-
 parser.add_argument(
     "--show",
     action="store_true",
@@ -32,8 +33,8 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-show_results = args.show
 
+show_results = args.show
 image_input = args.image
 output_path = args.output
 limit = args.limit
@@ -51,6 +52,7 @@ for image_path in image_paths:
         continue
 
     original, lines_only, result = draw_lane_lines(image)
+    gray, blur, edges, roi_edges = process_image_steps(image)
 
     if os.path.isdir(image_input):
         output_dir = output_path
@@ -64,25 +66,38 @@ for image_path in image_paths:
             os.makedirs(output_dir, exist_ok=True)
         save_path = output_path
 
+    # Save final overlay result
     cv2.imwrite(save_path, cv2.cvtColor(result, cv2.COLOR_RGB2BGR))
     print(f"Saved output to: {save_path}")
 
-if show_results:
-    plt.figure(figsize=(18, 5))
+    # Save intermediate pipeline outputs
+    base_name = os.path.splitext(os.path.basename(save_path))[0]
+    save_dir = os.path.dirname(save_path) if os.path.dirname(
+        save_path) else "output"
+    os.makedirs(save_dir, exist_ok=True)
 
-    plt.subplot(1, 3, 1)
-    plt.imshow(original)
-    plt.title("Original Image")
-    plt.axis("off")
+    cv2.imwrite(os.path.join(save_dir, f"{base_name}_gray.png"), gray)
+    cv2.imwrite(os.path.join(save_dir, f"{base_name}_blur.png"), blur)
+    cv2.imwrite(os.path.join(save_dir, f"{base_name}_edges.png"), edges)
+    cv2.imwrite(os.path.join(
+        save_dir, f"{base_name}_roi_edges.png"), roi_edges)
 
-    plt.subplot(1, 3, 2)
-    plt.imshow(lines_only)
-    plt.title("Detected Lane Lines Only")
-    plt.axis("off")
+    if show_results:
+        plt.figure(figsize=(18, 5))
 
-    plt.subplot(1, 3, 3)
-    plt.imshow(result)
-    plt.title("Overlay Result")
-    plt.axis("off")
+        plt.subplot(1, 3, 1)
+        plt.imshow(original)
+        plt.title("Original Image")
+        plt.axis("off")
 
-    plt.show()
+        plt.subplot(1, 3, 2)
+        plt.imshow(lines_only)
+        plt.title("Detected Lane Lines Only")
+        plt.axis("off")
+
+        plt.subplot(1, 3, 3)
+        plt.imshow(result)
+        plt.title("Overlay Result")
+        plt.axis("off")
+
+        plt.show()
