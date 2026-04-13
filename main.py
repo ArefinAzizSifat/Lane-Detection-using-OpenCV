@@ -136,26 +136,33 @@ y2 = int(height * 0.6)
 left_line = make_line_points(y1, y2, left_avg)
 right_line = make_line_points(y1, y2, right_avg)
 
-final_image = image_rgb.copy()
+line_image = np.zeros_like(image_rgb)
 
 if left_line is not None:
     x1, y1, x2, y2 = left_line
-    cv2.line(final_image, (x1, y1), (x2, y2), (255, 0, 0), 5)
+    cv2.line(line_image, (x1, y1), (x2, y2), (255, 0, 0), 8)
 
 if right_line is not None:
     x1, y1, x2, y2 = right_line
-    cv2.line(final_image, (x1, y1), (x2, y2), (255, 0, 0), 5)
+    cv2.line(line_image, (x1, y1), (x2, y2), (255, 0, 0), 8)
+
+combo_image = cv2.addWeighted(image_rgb, 0.8, line_image, 1.0, 0)
 
 plt.figure(figsize=(18, 5))
 
-plt.subplot(1, 2, 1)
+plt.subplot(1, 3, 1)
 plt.imshow(image_rgb)
 plt.title("Original Image")
 plt.axis("off")
 
-plt.subplot(1, 2, 2)
-plt.imshow(final_image)
-plt.title("Averaged Left and Right Lines")
+plt.subplot(1, 3, 2)
+plt.imshow(line_image)
+plt.title("Detected Lane Lines Only")
+plt.axis("off")
+
+plt.subplot(1, 3, 3)
+plt.imshow(combo_image)
+plt.title("Overlay Result")
 plt.axis("off")
 
 plt.show()
