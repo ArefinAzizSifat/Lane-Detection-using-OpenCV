@@ -24,7 +24,15 @@ parser.add_argument(
     default=5,
     help="Number of images to process from the folder"
 )
+
+parser.add_argument(
+    "--show",
+    action="store_true",
+    help="Display matplotlib results"
+)
+
 args = parser.parse_args()
+show_results = args.show
 
 image_input = args.image
 output_path = args.output
@@ -59,6 +67,7 @@ for image_path in image_paths:
     cv2.imwrite(save_path, cv2.cvtColor(result, cv2.COLOR_RGB2BGR))
     print(f"Saved output to: {save_path}")
 
+if show_results:
     plt.figure(figsize=(18, 5))
 
     plt.subplot(1, 3, 1)
