@@ -35,12 +35,30 @@ cv2.fillPoly(mask, polygon, 255)
 
 roi_edges = cv2.bitwise_and(edges, mask)
 
+lines = cv2.HoughLinesP(
+    roi_edges,
+    2,
+    np.pi / 180,
+    threshold=50,
+    minLineLength=40,
+    maxLineGap=20
+)
+
 # OpenCV loads color as BGR, matplotlib expects RGB
 image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
 image_with_roi = image_rgb.copy()
+
+line_image = image_rgb.copy()
 cv2.polylines(image_with_roi, polygon, isClosed=True,
               color=(255, 0, 0), thickness=3)
+if lines is not None:
+    print("Number of detected lines:", len(lines))
+    for line in lines:
+        x1, y1, x2, y2 = line[0]
+        cv2.line(line_image, (x1, y1), (x2, y2), (255, 0, 0), 3)
+else:
+    print("No lines detected.")
 
 plt.figure(figsize=(18, 5))
 
@@ -55,8 +73,8 @@ plt.title("Original Image with ROI Polygon")
 plt.axis("off")
 
 plt.subplot(1, 3, 3)
-plt.imshow(roi_edges, cmap="gray")
-plt.title("Edges After ROI")
+plt.imshow(line_image)
+plt.title("Detected Line Segments")
 plt.axis("off")
 
 plt.show()
