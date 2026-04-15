@@ -81,8 +81,6 @@ This project currently supports:
 lane-detection-opencv/
 ├── assets/
 │   └── results/
-├── data_road/
-├── output/
 ├── main.py
 ├── utils.py
 ├── requirements.txt
