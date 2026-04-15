@@ -24,12 +24,6 @@ Why KITTI was chosen:
 - suitable for road and lane-related scene analysis
 - manageable for a first OpenCV-based project
 
-Dataset folder used in this project:
-
-```bash
-data_road/training/image_2/
-```
-
 ## Method
 
 The lane detection pipeline consists of the following steps:
